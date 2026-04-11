@@ -1,0 +1,161 @@
+---
+title: "Glamour Theming Demo"
+format:
+  html:
+    self-contained: true
+    code-fold: true
+    theme: cosmo
+execute:
+  warning: false
+  message: false
+---
+
+## Setup
+
+Load the package via `devtools::load_all()` and initialize fonts.
+
+```{r setup}
+library(ggplot2)
+library(ggtext)
+
+# Load all glamour functions from the package source
+devtools::load_all()
+
+# Register Google Fonts and activate showtext rendering
+load_glamour_fonts()
+```
+
+---
+
+## Palettes
+
+```{r palettes, fig.height=1.8}
+show_palette("warm")
+show_palette("slate")
+show_palette("midnight")
+```
+
+---
+
+## 1 · Scatter Plot — Colored Title Replaces Legend
+
+The Glamour of Graphics principle: encode your groups in the title using
+`color_label()`, then set `legend = "none"`.
+
+```{r scatter, fig.width=8, fig.height=5}
+pal <- glamour_palette("warm")
+
+ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point(alpha = 0.8, size = 2.5) +
+  scale_color_manual(
+    values = c(
+      "f" = pal[["accent1"]],
+      "r" = pal[["accent2"]],
+      "4" = pal[["accent3"]]
+    )
+  ) +
+  labs(
+    title = paste(
+      color_label("Front-wheel", pal[["accent1"]]),
+      "cars are most efficient;",
+      color_label("rear-wheel", pal[["accent2"]]),
+      "the least"
+    ),
+    subtitle = color_legend(c(
+      "Front-wheel" = pal[["accent1"]],
+      "Rear-wheel"  = pal[["accent2"]],
+      "4WD"         = pal[["accent3"]]
+    )),
+    x = "Engine displacement (L)",
+    y = "Highway MPG",
+    caption = "Source: ggplot2::mpg"
+  ) +
+  theme_glamour(palette = "warm", legend = "none")
+```
+
+---
+
+## 2 · Bar Chart — Horizontal with Grid Lines
+
+Flip coordinates to avoid head-tilting on category labels.
+Use a light horizontal grid to aid reading bar lengths.
+
+```{r bar, fig.width=8, fig.height=5}
+pal <- glamour_palette("slate")
+
+mpg |>
+  dplyr::summarise(mean_hwy = mean(hwy), .by = class) |>
+  dplyr::arrange(mean_hwy) |>
+  dplyr::mutate(class = forcats::fct_inorder(class)) |>
+  ggplot(aes(mean_hwy, class)) +
+  geom_col(fill = pal[["accent1"]], width = 0.7) +
+  geom_text(
+    aes(label = round(mean_hwy, 1)),
+    hjust = -0.2,
+    size  = 3,
+    family = glamour_fonts()[["sans"]],
+    color  = pal[["ink"]]
+  ) +
+  labs(
+    title    = "Compact and subcompact cars lead on highway MPG",
+    subtitle = "Mean highway miles per gallon by vehicle class",
+    x        = NULL,
+    y        = NULL,
+    caption  = "Source: ggplot2::mpg"
+  ) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
+  theme_glamour(palette = "slate", grid = "x")
+```
+
+---
+
+## 3 · Line Chart — Dark Background
+
+Switch to the `"midnight"` palette for presentation-style slides.
+
+```{r line, fig.width=8, fig.height=5}
+pal <- glamour_palette("midnight")
+
+economics |>
+  dplyr::filter(date >= as.Date("2000-01-01")) |>
+  ggplot(aes(date, unemploy / pop)) +
+  geom_line(color = pal[["accent1"]], linewidth = 1) +
+  geom_area(fill = pal[["accent1"]], alpha = 0.15) +
+  labs(
+    title    = "Unemployment spiked sharply during the 2008 financial crisis",
+    subtitle = "Unemployed persons as a share of total US population, 2000–present",
+    x        = NULL,
+    y        = NULL,
+    caption  = "Source: ggplot2::economics"
+  ) +
+  scale_y_continuous(labels = scales::label_percent(scale = 100)) +
+  theme_glamour(palette = "midnight")
+```
+
+---
+
+## 4 · Faceted Plot
+
+Faceting with stripped backgrounds and bold strip labels.
+
+```{r facet, fig.width=9, fig.height=5}
+pal <- glamour_palette("warm")
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(color = pal[["accent1"]], alpha = 0.7, size = 2) +
+  geom_smooth(
+    method = "lm", se = FALSE,
+    color = pal[["accent2"]], linewidth = 0.8
+  ) +
+  facet_wrap(~drv, labeller = labeller(
+    drv = c("f" = "Front-wheel", "r" = "Rear-wheel", "4" = "4WD")
+  )) +
+  labs(
+    title    = "The displacement–efficiency relationship holds across all drive types",
+    subtitle = "Linear trend overlaid; shading removed to reduce ink",
+    x        = "Engine displacement (L)",
+    y        = "Highway MPG",
+    caption  = "Source: ggplot2::mpg"
+  ) +
+  theme_glamour(palette = "warm", grid = "y")
+```

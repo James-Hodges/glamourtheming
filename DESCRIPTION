@@ -1,0 +1,25 @@
+Package: glamour
+Title: Personal ggplot2 Themes and Utilities Inspired by the Glamour of Graphics
+Version: 0.1.0
+Authors@R:
+    person("James", role = c("aut", "cre"),
+           email = "james@example.com")
+Description: A personal collection of ggplot2 theme functions, color palettes,
+    typography helpers, and annotation utilities built around the visual design
+    principles from Will Chase's "Glamour of Graphics" (rstudio::conf 2020).
+    Encourages direct labeling, intentional typography, stripped-down grids,
+    and purposeful color use.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    ggplot2 (>= 3.4.0),
+    ggtext,
+    sysfonts,
+    showtext,
+    scales
+Suggests:
+    devtools,
+    ggrepel,
+    quarto
